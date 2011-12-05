@@ -1,0 +1,124 @@
+<html>
+<head>
+  <title>Tailer</title>
+<style>
+#log {
+  border: 1px solid #eee;
+  padding: 1em 1em 0 1em;
+  min-height: 20em;
+  overflow-y: auto;
+}
+
+.log-message {
+  clear: both;
+}
+
+.timestamp {
+  float: left;
+  margin: 0;
+  padding: 0 1em 0 0;
+  text-align: right;
+  width: 100px;
+}
+
+.message {
+  float: left;
+  margin: 0 0 1em 0;
+  padding: 0 0 0 1em;
+  border-left: 1px solid #eee;
+}
+
+#actions {
+  margin-bottom: 0.5em;
+}
+
+span[data-type=button] {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  color: #333;
+  cursor: pointer;
+  display: inline-block;
+  padding: 2px 5px;
+
+  -webkit-transition: all 0.1s ease-in;
+  -moz-transition: all 0.1s ease-in;
+  -o-transition: all 0.1s ease-in;
+  -ms-transition: all 0.1s ease-in;
+  transition: all 0.1s ease-in;
+}
+
+span[data-type=button]:hover {
+  background-color: #f8f8f8;
+}
+
+span[data-type=button]:active {
+  color: #f00;
+}
+
+</style>
+</head>
+<body>
+
+<div id="actions">
+  <span data-type="button" data-action="clear">Clear Log</span>
+  <span data-type="button" data-action="pause">Pause</span>
+  <span class="misses"></span>
+</div>
+
+<div id="log"></div>
+
+<script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+<script src="http://localhost:8228/nowjs/now.js"></script>
+<script>
+$(function(){
+  now.addLog = function(msg) {
+    if (isPaused) return missed();
+
+    var d = new Date;
+    var hour = d.getHours();
+    var min = d.getMinutes();
+    var sec = d.getSeconds();
+    if ((min+'').length == 1) min = "0" + min;
+    if ((sec+'').length == 1) sec = "0" + sec;
+
+    var time_string = (hour % 12) + ':' + min + ':' + sec + ' ' + (hour < 12 ? 'am' : 'pm');
+    $('#log').prepend('<div class="log-message"><pre class="timestamp">' + time_string + '</pre><pre class="message">' + msg + '</pre></div>');
+  }
+
+  $('span[data-type=button]').click(function(){
+    var action = $(this).data('action');
+    if (LogActions[action] && typeof(LogActions[action]) == 'function') {
+      LogActions[action]($(this));
+    }
+  });
+
+  var LogActions = {
+    clear: function($btn){
+      $('#log').html('');
+    },
+    pause: function($btn){
+      isPaused = !isPaused;
+      var btnText;
+      if (isPaused) {
+        btnText = 'Unpause';
+      } else {
+        misses = 0;
+        $('.misses').hide();
+        btnText = 'Pause';
+      }
+      $btn.html(btnText);
+    }
+  };
+
+  var isPaused = false;
+  var misses = 0;
+
+  function missed() {
+    misses++;
+    $('.misses').html('( ' + misses + ' )').show();
+  }
+});
+</script>
+
+</body>
+</html>
