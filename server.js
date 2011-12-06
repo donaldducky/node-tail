@@ -21,7 +21,6 @@ console.log('Running server http://localhost:8228');
 var everyone = require('now').initialize(server);
 
 everyone.connected(function(){
-  //console.log('Joined: ' + this.now.name);
   util.log('Someone joined');
   everyone.getUsers(function(users){
     console.log('Total users: ', users.length);
@@ -30,7 +29,6 @@ everyone.connected(function(){
 });
 
 everyone.disconnected(function(){
-  //console.log('Left: ' + this.now.name);
   util.log('Someone left');
   everyone.getUsers(function(users){
     console.log('Total users: ', users.length);
